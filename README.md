@@ -1,5 +1,5 @@
 # Face_Recog_Project
-##Application made using the face_recognition library
+## Application made using the face_recognition library
 
 Here I have made a simple application on python which make use of the face_recognition library given below
 https://github.com/ageitgey/face_recognition
@@ -19,7 +19,15 @@ Dependencies - python libraries
 
 I have used [InfluxDB](https://docs.influxdata.com/influxdb/v1.7) for the database software beacuse of its time-series property
 
-##FLOW OF PROGRAM
+## FLOW OF PROGRAM
+
+Flask server receives a `.jpg` from the webpage `index.html` by a POST request which is processed and a timestamp is created using the `time` library. Filename of the file that was received is replaced with a 16-digit timestamp and this file is dumped into the `imageDump` directory.
+`xyz.jpg` becomes `1456278646465678.jpg` lets call this 16-digit filename as `timestamp.jpg`
+
+
+
+
+
 
 
 
