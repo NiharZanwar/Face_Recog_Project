@@ -22,7 +22,10 @@ I have used [InfluxDB](https://docs.influxdata.com/influxdb/v1.7) for the databa
 ## FLOW OF PROGRAM
 
 Flask server receives a `.jpg` from the webpage `index.html` by a POST request which is processed and a timestamp is created using the `time` library. Filename of the file that was received is replaced with a 16-digit timestamp and this file is dumped into the `imageDump` directory.
+
 `xyz.jpg` becomes `1456278646465678.jpg` lets call this 16-digit filename as `timestamp.jpg`
+
+
 
 
 
