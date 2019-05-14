@@ -29,9 +29,18 @@ If name of a person is known a file by name `name.jpg` can be put into the direc
 
 `imageDump` now has two types of filenames `timestamp.jpg` and `name_timestamp.jpg` out of which it is assumed that the latter one only has one face in it.
 
-Files from `imageDump` are scanned from for faces and if found they are dumped into `detected_faces` with file name `name_f###_timestamp.jpg` or `f###_timestamp.jpg` in different cases of whether name was there previously.
+Files from `imageDump` are scanned from for faces and if found they are dumped into `detected_faces` with file name `name_f###_timestamp.jpg` or `f###_timestamp.jpg` in different cases of whether name was there previously.`f###` is the face number found in the picture picked up from `imageDump`. First face found will have f001 and secong face found f002 etc.  
 
-Here is where the recognition part starts. Face images are picked up from `detected_faces` and encoded into a numpy array then compared to previously encoded numpy arrays stored in `numpy_arrays`. If no match is found then new entry is made into `numpy_arrays` by filename `name_UniqueID.npy` or `null_UniqueID.npy` and a transaction is put into `InfluxDB` database
+Here is where the recognition part starts. Face images are picked up from `detected_faces` and encoded into a numpy array then compared to previously encoded numpy arrays stored in `numpy_arrays`. If no match is found then new entry is made into `numpy_arrays` by filename `name_UniqueID.npy` or `null_UniqueID.npy` and a transaction is put into `InfluxDB` database.
+`UniqueID` is a special 6-digit number given to every unique face and the next `UniqueID` to be generated is stored in `idGen.txt`
+
+If match is found then:
+1) `null_UniqueID` gets matched with `f###_timestamp.jpg` then no changes made anywhere just database is updated
+2) `name_UniqueID` gets matched with `f###_timestamp.jpg` then no changes made anywhere just database is updated
+3) `null_UniqueID` gets matched with `name_f###_timestamp.jpg` then `null_UniqueID` is made `name_UniqueID` along with database being updated
+4) `name_UniqueID` gets matched with `name_f###_timestamp.jpg` then no changes made anywhere just database is updated
+
+All faces that were matched with existing ones are dumped into                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 
 
 
