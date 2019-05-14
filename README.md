@@ -25,7 +25,13 @@ Flask server receives a `.jpg` from the webpage `index.html` by a POST request w
 
 `xyz.jpg` becomes `1456278646465678.jpg` lets call this 16-digit filename as `timestamp.jpg`
 
+If name of a person is known a file by name `name.jpg` can be put into the directory `ManualImageDump` from where it is modified to `name_timestamp.jpg` and dumped into `imageDump`
 
+`imageDump` now has two types of filenames `timestamp.jpg` and `name_timestamp.jpg` out of which it is assumed that the latter one only has one face in it.
+
+Files from `imageDump` are scanned from for faces and if found they are dumped into `detected_faces` with file name `name_f###_timestamp.jpg` or `f###_timestamp.jpg` in different cases of whether name was there previously.
+
+Here is where the recognition part starts. Face images are picked up from `detected_faces` and encoded into a numpy array then compared to previously encoded numpy arrays stored in `numpy_arrays`. If no match is found then new entry is made into `numpy_arrays` by filename `name_UniqueID.npy` or `null_UniqueID.npy` and a transaction is put into `InfluxDB` database
 
 
 
