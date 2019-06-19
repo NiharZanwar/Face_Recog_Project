@@ -478,6 +478,8 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
         update_info(s_txn_face_table, s_txface_id, txn_face_id, s_txface_path, face_dst_rel)
 
         stored = 'Yes'
+        duplicate = 0
+        times_visited =0
 
         if k == 1:  # new face encounter
 
@@ -703,7 +705,7 @@ def full_img_txn(tx_img_id, img_path, time_capture, time_receive):
     connection = sql_connection()[1]
     try:
         with connection.cursor() as cursor:
-            sql = " UPDATE tx_img_id SET `timecapture` = %s, `timereceive`= %s,`path` = %s WHERE `tx_img_id` = %s)"
+            sql = " UPDATE tx_img_id SET `timecapture` = %s, `timereceive`= %s,`path` = %s WHERE `tx_img_id` = %s"
             cursor.execute(sql, (time_capture, time_receive, img_path, tx_img_id))
             connection.commit()
         return 214, errordict[214]
