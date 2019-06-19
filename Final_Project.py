@@ -352,10 +352,10 @@ def add_new_txn(face_id, times_visited, link_no, time, duplicate, oid, bucketid,
 def create_new_user(username, password, email, createddatetime, oid, displayname):
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        sql = "INSERT INTO `orgUser` (`username`, `userpassword`,`useremail`,`createddatetime`,`oid`,`displayname` " \
-              "VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        sql = "INSERT INTO `orgUser` (`username`, `userpassword`,`useremail`,`createddatetime`,`oid`,`displayname`) " \
+              "VALUES (%s, %s, %s, %s, %s, %s)"
         try:
-            cursor.execute(sql, (username, password, email, createddatetime, oid, displayname, '0'))
+            cursor.execute(sql, (username, password, email, createddatetime, oid, displayname))
             connection.commit()
             return 212, errordict[212]
         except:
@@ -407,13 +407,13 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
     bucket_path = dir_path + Organisation + o_code + '/' + bucket_code
     bucket_path_rel = Organisation + o_code + '/' + bucket_code
 
-    image = face_recognition.load_image_file(dir_path + temp_img_dir + txn_img_id + '_' + time + '.jpg')
-    im = Image.open(dir_path + temp_img_dir + txn_img_id + '_' + time + '.jpg')
+    image = face_recognition.load_image_file(dir_path + temp_img_dir + txn_img_id + '_' + time.replace(' ', '_') + '.jpg')
+    im = Image.open(dir_path + temp_img_dir + txn_img_id + '_' + time.replace(' ', '_') + '.jpg')
     face_locations = face_recognition.face_locations(image, number_of_times_to_upsample=1)
-    print("detected {} face(s) in this photograph.-{}".format(len(face_locations), txn_img_id + '_' + time + '.jpg'))
+    print("detected {} face(s) in this photograph.-{}".format(len(face_locations), txn_img_id + '_' + time.replace(' ', '_') + '.jpg'))
 
-    dump_path = bucket_path + '/' + camera_code + '_dump/' + txn_img_id + '_' + time + '.jpg'
-    dump_path_rel = bucket_path_rel + '/' + camera_code + '_dump/' + txn_img_id + '_' + time + '.jpg'
+    dump_path = bucket_path + '/' + camera_code + '_dump/' + txn_img_id + '_' + time.replace(' ', '_') + '.jpg'
+    dump_path_rel = bucket_path_rel + '/' + camera_code + '_dump/' + txn_img_id + '_' + time.replace(' ', '_') + '.jpg'
 
     update_info(s_txn_img_table, s_tximg_id, txn_img_id, s_face_count, len(face_locations))
 
@@ -433,7 +433,7 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
         top, right, bottom, left = face_location
         crop = im.crop((left - crop_margin, top - crop_margin, right + crop_margin, bottom + crop_margin))
         txn_obj_id = str(add_new_obj_txn(txn_img_id, oid, bucket_id, camera_id, time, top, left, right, bottom, '1')[1]).zfill(10)
-        crop_name = txn_obj_id + '_' + txn_img_id + '_' + str(j).zfill(3) + '_' + time
+        crop_name = txn_obj_id + '_' + txn_img_id + '_' + str(j).zfill(3) + '_' + time.replace(' ', '_')
         crop_face_path = dir_path + temp_img_dir + crop_name + '.jpg'
         crop.save(crop_face_path)
 
@@ -442,7 +442,7 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
         current_img = face_recognition.load_image_file(crop_face_path)
 
         try:
-            current_img_enc = face_recognition.face_encodings(current_img, num_jitters=5)[0]
+            current_img_enc = face_recognition.face_encodings(current_img, num_jitters=3)[0]
         except:
             print("indexError for {}".format(crop_face_path))
             destination = bucket_path + error_enc_dir + crop_name + '.jpg'
@@ -479,8 +479,8 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
 
         stored = 'Yes'
         duplicate = 0
-        times_visited = 0
-        
+        times_visited =0
+
         if k == 1:  # new face encounter
 
             duplicate = 0
@@ -538,7 +538,7 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
 
         j += 1
 
-    source = dir_path + temp_img_dir + txn_img_id + '_' + time + '.jpg'
+    source = dir_path + temp_img_dir + txn_img_id + '_' + time.replace(' ', '_') + '.jpg'
     destination = dump_path
     os.rename(source, destination)
     return json_initial
@@ -703,13 +703,12 @@ def initial_transaction(bucket_id, oid, camera_id):
 
 def full_img_txn(tx_img_id, img_path, time_capture, time_receive):
     connection = sql_connection()[1]
-    
     try:
         with connection.cursor() as cursor:
-            sql = "UPDATE tx_img_id SET `timecapture` = %s,`timereceive`= %s,`path`= %s WHERE `tx_img_id` = %s"
+            sql = " UPDATE tx_img_id SET `timecapture` = %s, `timereceive`= %s,`path` = %s WHERE `tx_img_id` = %s"
             cursor.execute(sql, (time_capture, time_receive, img_path, tx_img_id))
             connection.commit()
-            return 214, errordict[214]
+        return 214, errordict[214]
 
     except:
         return 124, sys.exc_info()[1]
