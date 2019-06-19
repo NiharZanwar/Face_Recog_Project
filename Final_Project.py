@@ -1,7 +1,7 @@
 import datetime
 import pymysql.cursors
 import os
-import face_recognitio
+import face_recognition
 import numpy
 from PIL import Image
 import json
