@@ -4,7 +4,7 @@ import time
 import datetime
 import Final_Project
 import json
-import sys
+import  sys
 
 
 app = Flask(__name__)
@@ -107,7 +107,7 @@ def user_new():
             except:
                 return redirect(url_for('error', error_str=sys.exec_info()[1], error_code=render_issue))
         else:
-            return redirect(url_for('error', error_str=newcheck[1], error_code=newcheck[0]))
+            return redirect(url_for('error', error_str=nextcheck[1], error_code=nextcheck[0]))
     else:
         return redirect(url_for('error', error_str=check[1], error_code=check[0]))
 
@@ -303,7 +303,7 @@ def upload_file():
 
     file = request.files['image']
     imgtxn_id = str((Final_Project.initial_transaction(bucket_id, oid, camera_id))[1]).zfill(10)
-    file.filename = imgtxn_id + '_' + time_now + '.jpg'
+    file.filename = imgtxn_id + '_' + time_now.replace(' ', '_') + '.jpg'
     f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(f)
 
@@ -320,8 +320,9 @@ def upload_file():
     time_taken = start - end
     res = json.dumps(json_2, indent=4, sort_keys=True) + str(time_taken)
     return render_template('result.html', value=res)
-    
+    # return ('<pre>'+json.dumps(json_2, indent=4, sort_keys=True)+str(time_taken) + '</pre>')
+    # return (json.dumps(json_2, indent=4, sort_keys=True)+str(time_taken))
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.1.222', debug=True, port=5002, threaded=True)
+    app.run(host='192.168.1.226', debug=True, port=5002, threaded=True)
