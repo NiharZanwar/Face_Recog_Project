@@ -407,13 +407,13 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
     bucket_path = dir_path + Organisation + o_code + '/' + bucket_code
     bucket_path_rel = Organisation + o_code + '/' + bucket_code
 
-    image = face_recognition.load_image_file(dir_path + temp_img_dir + txn_img_id + '_' + time + '.jpg')
-    im = Image.open(dir_path + temp_img_dir + txn_img_id + '_' + time + '.jpg')
+    image = face_recognition.load_image_file(dir_path + temp_img_dir + txn_img_id + '_' + time.replace(' ', '_') + '.jpg')
+    im = Image.open(dir_path + temp_img_dir + txn_img_id + '_' + time.replace(' ', '_') + '.jpg')
     face_locations = face_recognition.face_locations(image, number_of_times_to_upsample=1)
-    print("detected {} face(s) in this photograph.-{}".format(len(face_locations), txn_img_id + '_' + time + '.jpg'))
+    print("detected {} face(s) in this photograph.-{}".format(len(face_locations), txn_img_id + '_' + time.replace(' ', '_') + '.jpg'))
 
-    dump_path = bucket_path + '/' + camera_code + '_dump/' + txn_img_id + '_' + time + '.jpg'
-    dump_path_rel = bucket_path_rel + '/' + camera_code + '_dump/' + txn_img_id + '_' + time + '.jpg'
+    dump_path = bucket_path + '/' + camera_code + '_dump/' + txn_img_id + '_' + time.replace(' ', '_') + '.jpg'
+    dump_path_rel = bucket_path_rel + '/' + camera_code + '_dump/' + txn_img_id + '_' + time.replace(' ', '_') + '.jpg'
 
     update_info(s_txn_img_table, s_tximg_id, txn_img_id, s_face_count, len(face_locations))
 
@@ -437,7 +437,7 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
         crop_face_path = dir_path + temp_img_dir + crop_name + '.jpg'
         crop.save(crop_face_path)
 
-        print("cropped face - {} for image {}".format(j, camera_code + time + '.jpg'))
+        print("cropped face - {} for image {}".format(j, camera_code + time.replace(' ', '_') + '.jpg'))
         # j += 1 put this at the end of this loop
         current_img = face_recognition.load_image_file(crop_face_path)
 
@@ -538,7 +538,7 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
 
         j += 1
 
-    source = dir_path + temp_img_dir + txn_img_id + '_' + time + '.jpg'
+    source = dir_path + temp_img_dir + txn_img_id + '_' + time.replace(' ', '_') + '.jpg'
     destination = dump_path
     os.rename(source, destination)
     return json_initial
