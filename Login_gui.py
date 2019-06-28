@@ -1,10 +1,10 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
 import time
 import datetime
 import Final_Project
 import json
-
+import sys
 
 app = Flask(__name__)
 
@@ -15,7 +15,7 @@ app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 @app.route('/')
 def login():
     session.pop('username', None)
-    return render_template('indexnew.html')
+    return render_template('upload_photo.html')
 
 
 @app.route('/dashboard', methods=['POST'])
@@ -34,7 +34,6 @@ def login_check():
         session['username'] = username
         try:
             return redirect(url_for('login_done', username=username))
-            # return render_template('upload_photo.html')
         except:
             return redirect(url_for('error', error_str=sys.exec_info()[1], error_code=render_issue))
     else:
@@ -44,6 +43,7 @@ def login_check():
 @app.route('/dashboard/<username>')
 def login_done(username):
     if 'username' in session:
+        print(username)
         session.pop('username', None)
         return render_template('upload_photo.html')
 
@@ -57,12 +57,11 @@ def error(error_str, error_code):
 @app.route('/upload', methods=['POST'])
 def upload_file():
     start = time.time()
-    UPLOAD_FOLDER = os.path.basename('temp_img_dir')
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    upload_folder = os.path.basename('temp_img_dir')
+    app.config['UPLOAD_FOLDER'] = upload_folder
 
     time_now = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     cameracode = request.form['camcode']
-    # cameracode = 'CAM000000031'
     camera_id = cameracode[3:]
 
     info = Final_Project.extract_info(Final_Project.s_cam_table, Final_Project.s_cam_id, camera_id)[1]
@@ -87,30 +86,41 @@ def upload_file():
     f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(f)
 
-    time_capture = Final_Project.get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)  ##reduced to relative
+    time_capture = Final_Project.get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)
     if len(time_capture) == 0:
         time_capture = time_now
 
-    img_path = Final_Project.Organisation + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename  ##reduced to relative
+    img_path = Final_Project.Organisation + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename
     Final_Project.full_img_txn(imgtxn_id, img_path, time_capture, time_now)
 
     json1 = Final_Project.input_image(cameracode, time_now, imgtxn_id, bucket_id, oid, camera_id)
     json_2 = json.loads(json1)
     end = time.time()
     time_taken = start - end
+    """
+    sep_path = json_2["Face Data"][0]["File Path"].split('/')
+    i = 1
+    lead = len(sep_path) - 2
+    join_path = ''
+    while i < lead:
+        join_path = join_path + sep_path[i] + '/'
+        i += 1
+    join_path = join_path + sep_path[lead]
+    img_path1 = join_path.replace('/', ':')
+    names = sep_path[lead + 1]
+    """
     res = json.dumps(json_2, indent=4, sort_keys=True) + str(time_taken)
     return render_template('result.html', value=res)
 
 
 @app.route('/Manual', methods=['POST'])
-def upload_file():
+def upload_fil():
     start = time.time()
-    UPLOAD_FOLDER = os.path.basename('temp_img_dir')
-    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    upload_folder = os.path.basename('temp_img_dir')
+    app.config['UPLOAD_FOLDER'] = upload_folder
 
     time_now = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     cameracode = request.form['camcode']
-    # cameracode = 'CAM000000031'
     camera_id = cameracode[3:]
 
     info = Final_Project.extract_info(Final_Project.s_cam_table, Final_Project.s_cam_id, camera_id)[1]
@@ -135,11 +145,11 @@ def upload_file():
     f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(f)
 
-    time_capture = Final_Project.get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)  ##reduced to relative
+    time_capture = Final_Project.get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)
     if len(time_capture) == 0:
         time_capture = time_now
 
-    img_path = Final_Project.Organisation + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename  ##reduced to relative
+    img_path = Final_Project.Organisation + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename
     Final_Project.full_img_txn(imgtxn_id, img_path, time_capture, time_now)
 
     json1 = Final_Project.input_image(cameracode, time_now, imgtxn_id, bucket_id, oid, camera_id)
@@ -149,5 +159,6 @@ def upload_file():
     res = json.dumps(json_2, indent=4, sort_keys=True) + str(time_taken)
     return res
 
+
 if __name__ == '__main__':
-    app.run(host='192.168.1.226', debug=True, port=5000, threaded=True)
+    app.run(host='192.168.1.206', debug=True, port=5006, threaded=True)

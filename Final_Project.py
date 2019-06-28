@@ -1,4 +1,3 @@
-import datetime
 import pymysql.cursors
 import os
 import face_recognition
@@ -8,8 +7,6 @@ import json
 from PIL.ExifTags import TAGS
 from shutil import copy2
 import sys
-
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def sql_connection():
@@ -23,7 +20,6 @@ def sql_connection():
         return 230, connection
     except:
         return 130, sys.exc_info()[1]
-# --------------------------------------------------------------------------------------------------------------------
 
 
 s_org_table = 'organisation'
@@ -64,7 +60,6 @@ s_txobj_path = 'path'
 s_face_id = 'FaceID'
 s_person_id = 'PersonID'
 s_pics_stored = 'pics_stored'
-# --------------------------------------------------------------------------------------------------------------------
 
 dir_path = os.getcwd()
 
@@ -75,7 +70,7 @@ numpy_arrays = '/numpy_arrays/'
 Organisation = '/Organisations/'
 ManualImageDump = '/ManualImageDump/'
 crop_margin = 50
-# --------------------------------------------------------------------------------------------------------------------
+
 
 if not os.path.exists(dir_path + temp_img_dir):
     os.mkdir(dir_path + temp_img_dir)
@@ -86,7 +81,6 @@ if not os.path.exists(dir_path + Organisation):
 if not os.path.exists(dir_path + ManualImageDump):
     os.mkdir(dir_path + ManualImageDump)
 
-# --------------------------------------------------------------------------------------------------------------------
 errordict = {
     100: 'could not create bucket table',
     101: 'Could not create person table',
@@ -133,7 +127,6 @@ errordict = {
     219: 'Face transaction updated',
     230: 'Connection to database successful'
 }
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def extract_info(table, id_name, i_d):
@@ -147,7 +140,6 @@ def extract_info(table, id_name, i_d):
             return 228, rows
         except:
             return 128, sys.exc_info()[1]
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def add_new_camera(cameraname, bucketcode, cameratype, orgcode, createddatetime):
@@ -184,7 +176,6 @@ def add_new_camera(cameraname, bucketcode, cameratype, orgcode, createddatetime)
         return 123, sys.exc_info()[1]
 
     return 202, camera_code
-# --------------------------------CHANGES-----------------------------------------------------------------
 
 
 def add_new_org(org_name, org_logo, org_email, created_date_time, org_key):
@@ -212,9 +203,6 @@ def add_new_org(org_name, org_logo, org_email, created_date_time, org_key):
         return 120, sys.exc_info()[1]
 
     return 203, org_code
-
-
-# --------------------------------CHANGES----------------------------------------------------------
 
 
 def add_new_bucket(bucket_name, created_date_time, buc_org_code):
@@ -254,7 +242,6 @@ def add_new_bucket(bucket_name, created_date_time, buc_org_code):
         return 117, sys.exc_info()[1]
 
     return 204, bucket_code
-# --------------------------------------------------CHANGES----------------------------------------
 
 
 def add_new_faceid(personid, facepath, img_id, org_id, bucket_id):
@@ -264,7 +251,6 @@ def add_new_faceid(personid, facepath, img_id, org_id, bucket_id):
         cursor.callproc('new_face', [personid, facepath, img_id, org_id, bucket_id])
         face_id = cursor.fetchall()[0]['id']
     return face_id
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def del_org(org_id):
@@ -274,7 +260,6 @@ def del_org(org_id):
         cursor.execute("UPDATE `orgbucket` SET `markdelete` = '1' WHERE `oid` = %s", org_id)
         cursor.execute("UPDATE `orgCamera` SET `markdelete` = '1' WHERE `oid` = %s", org_id)
         connection.commit()
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def renew_org(org_id):
@@ -284,7 +269,6 @@ def renew_org(org_id):
         cursor.execute("UPDATE `orgbucket` SET `markdelete` = '0' WHERE `oid` = %s", org_id)
         cursor.execute("UPDATE `orgCamera` SET `markdelete` = '0' WHERE `oid` = %s", org_id)
         connection.commit()
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def del_bucket(bucket_id):
@@ -293,7 +277,6 @@ def del_bucket(bucket_id):
         cursor.execute("UPDATE `orgbucket` SET `markdelete` = '1' WHERE `bucketid` = %s", bucket_id)
         cursor.execute("UPDATE `orgCamera` SET `markdelete` = '1' WHERE `bucketid` = %s", bucket_id)
         connection.commit()
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def renew_bucket(bucket_id):
@@ -302,7 +285,6 @@ def renew_bucket(bucket_id):
         cursor.execute("UPDATE `orgbucket` SET `markdelete` = '0' WHERE `bucketid` = %s", bucket_id)
         cursor.execute("UPDATE `orgCamera` SET `markdelete` = '0' WHERE `bucketid` = %s", bucket_id)
         connection.commit()
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def del_camera(camera_id):
@@ -310,7 +292,6 @@ def del_camera(camera_id):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE `orgCamera` SET `markdelete` = '1' WHERE `cameraid` = %s", camera_id)
         connection.commit()
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def renew_camera(camera_id):
@@ -318,7 +299,6 @@ def renew_camera(camera_id):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE `orgCamera` SET `markdelete` = '0' WHERE `cameraid` = %s", camera_id)
         connection.commit()
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def del_user(user_id):
@@ -326,7 +306,6 @@ def del_user(user_id):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE `orgUser` SET `markdelete` = '1' WHERE `userid` = %s", user_id)
         connection.commit()
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def renew_user(user_id):
@@ -334,7 +313,6 @@ def renew_user(user_id):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE `orgUser` SET `markdelete` = '0' WHERE `userid` = %s", user_id)
         connection.commit()
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def add_new_txn(face_id, times_visited, link_no, time, duplicate, oid, bucketid, person_id):
@@ -345,8 +323,6 @@ def add_new_txn(face_id, times_visited, link_no, time, duplicate, oid, bucketid,
               " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
         cursor.execute(sql, (face_id, times_visited, link_no, time, duplicate, oid, bucketid, person_id))
         connection.commit()
-
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def create_new_user(username, password, email, createddatetime, oid, displayname):
@@ -360,8 +336,6 @@ def create_new_user(username, password, email, createddatetime, oid, displayname
             return 212, errordict[212]
         except:
             return 131, sys.exc_info()[1]
-
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def verify_user(username, password, o_code):
@@ -390,7 +364,6 @@ def verify_user(username, password, o_code):
         return 112, errordict[112]
 
     return 205, errordict[205]
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
@@ -407,24 +380,26 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
     bucket_path = dir_path + Organisation + o_code + '/' + bucket_code
     bucket_path_rel = Organisation + o_code + '/' + bucket_code
 
-    image = face_recognition.load_image_file(dir_path + temp_img_dir + txn_img_id + '_' + time.replace(' ', '_') + '.jpg')
+    image = face_recognition.load_image_file(dir_path + temp_img_dir + txn_img_id + '_' +
+                                             time.replace(' ', '_') + '.jpg')
     im = Image.open(dir_path + temp_img_dir + txn_img_id + '_' + time.replace(' ', '_') + '.jpg')
     face_locations = face_recognition.face_locations(image, number_of_times_to_upsample=1)
-    print("detected {} face(s) in this photograph.-{}".format(len(face_locations), txn_img_id + '_' + time.replace(' ', '_') + '.jpg'))
+    print("detected {} face(s) in this photograph.-{}".format(len(face_locations), txn_img_id + '_' +
+                                                              time.replace(' ', '_') + '.jpg'))
 
     dump_path = bucket_path + '/' + camera_code + '_dump/' + txn_img_id + '_' + time.replace(' ', '_') + '.jpg'
     dump_path_rel = bucket_path_rel + '/' + camera_code + '_dump/' + txn_img_id + '_' + time.replace(' ', '_') + '.jpg'
 
     update_info(s_txn_img_table, s_tximg_id, txn_img_id, s_face_count, len(face_locations))
 
-    json_int_dict = {
+    json_initial_dict = {
         "No of faces found": len(face_locations),
         "No of faces encoded": 0,
         "Dump Path": "",
         "Face Data": []
     }
 
-    json_initial = json.dumps(json_int_dict)
+    json_initial = json.dumps(json_initial_dict)
 
     j = 1
 
@@ -432,7 +407,8 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
 
         top, right, bottom, left = face_location
         crop = im.crop((left - crop_margin, top - crop_margin, right + crop_margin, bottom + crop_margin))
-        txn_obj_id = str(add_new_obj_txn(txn_img_id, oid, bucket_id, camera_id, time, top, left, right, bottom, '1')[1]).zfill(10)
+        txn_obj_id = str(add_new_obj_txn(txn_img_id, oid, bucket_id,
+                                         camera_id, time, top, left, right, bottom, '1')[1]).zfill(10)
         crop_name = txn_obj_id + '_' + txn_img_id + '_' + str(j).zfill(3) + '_' + time.replace(' ', '_')
         crop_face_path = dir_path + temp_img_dir + crop_name + '.jpg'
         crop.save(crop_face_path)
@@ -478,8 +454,6 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
         update_info(s_txn_face_table, s_txface_id, txn_face_id, s_txface_path, face_dst_rel)
 
         stored = 'Yes'
-        duplicate = 0
-        times_visited =0
 
         if k == 1:  # new face encounter
 
@@ -542,9 +516,9 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
     destination = dump_path
     os.rename(source, destination)
     return json_initial
-# --------------------------------------------------------------------------------------------------------------------
 
 
+"""
 json_int_dict = {
         "No of faces found": 0,
         "No of faces encoded": 0,
@@ -553,7 +527,7 @@ json_int_dict = {
 }
 
 json_initial = json.dumps(json_int_dict)
-# --------------------------------------------------------------------------------------------------------------------
+"""
 
 
 def to_json(json_input, name, face_id, timestamp, txn_img_id, top, bottom, left, right, person_id, org_name, org_code,
@@ -597,7 +571,6 @@ def to_json(json_input, name, face_id, timestamp, txn_img_id, top, bottom, left,
     json_append = json.dumps(json_input_dict, indent=5, sort_keys=False)
 
     return json_append
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def update_info(table, id_name, i_d, column, data):
@@ -606,7 +579,6 @@ def update_info(table, id_name, i_d, column, data):
         sql = "update {} set `{}`='{}' where `{}`={};".format(table, column, data, id_name, i_d)
         cursor.execute(sql)
         connection.commit()
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def get_datetime(fn):
@@ -631,7 +603,6 @@ def get_datetime(fn):
         return final
     except:
         return final
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def add_new_obj_txn(txn_img_id, oid, bucket_id, camera_id, time_capture, obj_top, obj_left, obj_right,
@@ -647,8 +618,6 @@ def add_new_obj_txn(txn_img_id, oid, bucket_id, camera_id, time_capture, obj_top
     except:
         return 126, sys.exc_info()[1]
 
-# --------------------------------------------------------------------------------------------------------------------
-
 
 def add_person(face_path, org_id):
     connection = sql_connection()[1]
@@ -656,7 +625,6 @@ def add_person(face_path, org_id):
         cursor.callproc('new_person', [face_path, org_id])
         person_id = cursor.fetchall()[0]['id']
     return person_id
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def add_new_face_txn(txn_img_id, txn_obj_id, oid, bucket_id, camera_id, time_capture):
@@ -669,8 +637,6 @@ def add_new_face_txn(txn_img_id, txn_obj_id, oid, bucket_id, camera_id, time_cap
         return 217, txn_face_id
     except:
         return 127, sys.exc_info()[1]
-
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def update_face_txn(txn_face_id, faceid, isduplicate, timesvisited, personid):
@@ -686,8 +652,6 @@ def update_face_txn(txn_face_id, faceid, isduplicate, timesvisited, personid):
     except:
         return 129, sys.exc_info()[1]
 
-# --------------------------------------------------------------------------------------------------------------------
-
 
 def initial_transaction(bucket_id, oid, camera_id):
     connection = sql_connection()[1]
@@ -698,18 +662,17 @@ def initial_transaction(bucket_id, oid, camera_id):
         return 215, img_id
     except:
         return 125, sys.exc_info()[1]
-# --------------------------------------------------------------------------------------------------------------------
 
 
 def full_img_txn(tx_img_id, img_path, time_capture, time_receive):
     connection = sql_connection()[1]
     try:
         with connection.cursor() as cursor:
-            sql = " UPDATE tx_img_id SET `timecapture` = %s, `timereceive`= %s,`path` = %s WHERE `tx_img_id` = %s"
+            sql = " UPDATE tx_img_id SET `timecapture` = %s, `timereceive`= %s,`path` = %s WHERE `tx_img_id` = %s)"
             cursor.execute(sql, (time_capture, time_receive, img_path, tx_img_id))
             connection.commit()
         return 214, errordict[214]
 
     except:
         return 124, sys.exc_info()[1]
-# --------------------------------------------------------------------------------------------------------------------
+
