@@ -4,7 +4,7 @@ import time
 import datetime
 import Final_Project
 import json
-import  sys
+import sys
 
 
 app = Flask(__name__)
@@ -16,7 +16,7 @@ delete_issue = 1000
 @app.route('/')
 def hello_world():
     try:
-        return render_template('index.html')
+        return render_template('index backup.html')
     except:
         return redirect(url_for('error', error_str=sys.exec_info()[1], error_code=render_issue))
 
@@ -307,11 +307,11 @@ def upload_file():
     f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(f)
 
-    time_capture = Final_Project.get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)  ##reduced to relative
+    time_capture = Final_Project.get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)
     if len(time_capture) == 0:
         time_capture = time_now
 
-    img_path = Final_Project.Organisation + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename  ##reduced to relative
+    img_path = Final_Project.Organisation + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename
     Final_Project.full_img_txn(imgtxn_id, img_path, time_capture, time_now)
 
     json1 = Final_Project.input_image(cameracode, time_now, imgtxn_id, bucket_id, oid, camera_id)
@@ -320,9 +320,7 @@ def upload_file():
     time_taken = start - end
     res = json.dumps(json_2, indent=4, sort_keys=True) + str(time_taken)
     return render_template('result.html', value=res)
-    # return ('<pre>'+json.dumps(json_2, indent=4, sort_keys=True)+str(time_taken) + '</pre>')
-    # return (json.dumps(json_2, indent=4, sort_keys=True)+str(time_taken))
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.1.226', debug=True, port=5002, threaded=True)
+    app.run(host='192.168.1.206', debug=True, port=5004, threaded=True)
