@@ -1,0 +1,23 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sightengine demo - Python and Flask</title>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/app.css') }}">
+</head>
+
+<body>
+<header class="navbar">
+  <form action="/update" method="post" enctype="multipart/form-data" >
+      <span class="btn btn-default btn-file">
+        Camera Code <input type="text" name="camcode">
+      </span>
+
+    <input type="submit" value="Update" class="btn btn-primary">
+  </form>
+
+
+</header>
+
+</body>
+</html>
+

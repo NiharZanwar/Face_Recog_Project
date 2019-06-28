@@ -1,0 +1,30 @@
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/app.css') }}">
+</head>
+
+<body>
+
+<header class="navbar">
+  <form action="/dashboard" method="post" enctype="multipart/form-data" >
+       <span class="btn btn-default btn-file">
+        Username <input type="text" name="username">
+      </span>
+	<span class="btn btn-default btn-file">
+        Password <input type="text" name="password">
+      </span>
+	<span class="btn btn-default btn-file">
+        Org Code <input type="text" name="org_code">
+      </span>
+	
+	<input type="submit" value="Login" class="btn btn-primary">
+  </form>
+
+
+</header>
+
+</body>
+</html>
