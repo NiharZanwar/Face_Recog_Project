@@ -1,0 +1,62 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="static/DataTables/datatables.min.css"/>
+ 
+<script type="text/javascript" src="static/DataTables/datatables.min.js"></script>
+<script>
+$(document).ready( function () {
+    $('#sparsh').DataTable();
+} );
+</script>
+</head>
+<body>
+  <form action="/request" method="POST">	
+  <select name="Duplicate">
+  <option value="">Is Duplicate:</option>
+  <option value="0">0</option>
+  <option value="1">1</option>
+  </select>
+  <select name="Times_Visited">
+  <option value="">Times Visited:</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  </select>
+  <input type="hidden" name="Organisations" value="{{ o_id }}">
+  <input type="hidden" name="table_name" value="{{ tables }}">
+  <input type="submit" value="Submit" class="btn btn-primary">
+
+  </form>
+	<table id="sparsh">
+		<thead>
+			<tr>
+				<th>Image</th>
+				{% for sparsh in field %}
+					<th>{{ sparsh }}</th>
+				{% endfor %}
+			</tr>
+								
+								
+		</thead>
+		<tbody>
+			{% for row in data %}								
+			<tr>
+				{% if path1 in row %}
+					{% if row[path1] is none %}
+						<td>None</td>
+					{% else %}
+						<td><img src="{{ url_for('download_file', filename='home'+row[path1]) }}" width="100" height="100"></td>
+					{% endif %}
+				{% else %}
+					<td>None</td>	
+				{% endif %}
+				{% for sparsh in field %}
+					<td>{{row[sparsh]}}</td>
+				{% endfor %}
+			</tr>
+			{% endfor %}
+								
+		<tbody>
+	</table>
+</body>
+</html>

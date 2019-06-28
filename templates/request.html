@@ -1,0 +1,24 @@
+<html>
+<body>
+<table>
+<tr>
+    <th id="PersonID">PersonID</th>
+    <th id="person_name">person_name</th>
+    <th id="face_data_1">face_data_1</th>
+    <th id="face_data_2">face_data_2</th>
+    <th id="face_data_3">face_data_3</th>
+    <th id="oid">oid</th>
+</tr>
+{% for row in data %}
+<tr>
+    <td headers="PersonID">{{row["PersonID"]}}</td>
+    <td headers="person_name">{{row["person_name"]}}</td>
+    <td headers="face_data_1">{{row["face_path_1"]}}</td>
+    <td headers="face_data_2">{{row["face_path_2"]}}</td>
+    <td headers="face_data_3">{{row["face_path_3"]}}</td>
+    <td headers="oid">{{row["oid"]}}</td>
+</tr>
+{% endfor %}
+</table>
+</body>
+</html>

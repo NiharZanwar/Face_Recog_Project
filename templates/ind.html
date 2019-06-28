@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Table V04</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->	
+	<link rel="icon" type="image/png" href="static/Table/images/icons/favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/Table/vendor/bootstrap/css/bootstrap.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/Table/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/Table/vendor/animate/animate.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/Table/vendor/select2/select2.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/Table/vendor/perfect-scrollbar/perfect-scrollbar.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="static/Table/css/util.css">
+	<link rel="stylesheet" type="text/css" href="static/Table/css/main.css">
+<!--===============================================================================================-->
+</head>
+<body>
+<p>Filters</p>
+  <form action="/request" method="POST">	
+  <select name="Duplicate">
+  <option value="">Is Duplicate:</option>
+  <option value="0">0</option>
+  <option value="1">1</option>
+  </select>
+  <select name="Times_Visited">
+  <option value="">Times Visited:</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  </select>
+  <input type="hidden" name="Organisations" value="{{ o_id }}">
+  <input type="hidden" name="table_name" value="{{ tables }}">
+  <input type="submit" value="Submit" class="btn btn-primary">
+
+  </form>
+	<div class="limiter">
+		<div class="container-table100">
+			<div class="wrap-table200">
+				<div class="table100 ver1 m-b-100">
+					<div class="table100-head">
+						<table>
+							<thead>
+								
+								<tr class="row100 head">
+								<th class="cell100 column1">Image</th>
+								{% for sparsh in field %}
+									<th class="cell100 column1">{{ sparsh }}</th>
+								{% endfor %}
+								</tr>
+								
+								
+							</thead>
+						</table>
+					</div>
+
+					<div class="table100-body js-pscroll">
+						<table>
+							<tbody>
+								{% for row in data %}								
+								<tr class="row100 body">
+									{% if path1 in row %}
+										{% if row[path1] is none %}
+										<td class="cell100 column1">None</td>
+										{% else %}
+										<td class="cell100 column1"><img src="{{ url_for('download_file', filename='home'+row[path1]) }}" width="100" height="100"></td>
+										{% endif %}
+{% else %}
+<td class="cell100 column1">None</td>
+									{% endif %}
+									{% for sparsh in field %}
+									<td class="cell100 column1">{{row[sparsh]}}</td>
+									{% endfor %}
+									
+								</tr>
+								{% endfor %}
+								
+							<tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+<!--===============================================================================================-->	
+	<script src="static/Table/vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+	<script src="static/Table/vendor/bootstrap/js/popper.js"></script>
+	<script src="static/Table/vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+	<script src="static/Table/vendor/select2/select2.min.js"></script>
+<!--===============================================================================================-->
+	<script src="static/Table/vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+	<script>
+		$('.js-pscroll').each(function(){
+			var ps = new PerfectScrollbar(this);
+
+			$(window).on('resize', function(){
+				ps.update();
+			})
+		});
+			
+		
+	</script>
+<!--===============================================================================================-->
+	<script src="static/Table/js/main.js"></script>
+
+</body>
+</html>

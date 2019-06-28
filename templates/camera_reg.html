@@ -1,0 +1,27 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>New Camera Registration</title>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/app.css') }}">
+</head>
+
+<body>
+<header class="navbar">
+  <form action="/camera_success" method="post" enctype="multipart/form-data" >
+       <span class="btn btn-default btn-file">
+        Camera Name <input type="text" name="name">
+      </span>
+	<span class="btn btn-default btn-file">
+        Camera Type <input type="text" name="type">
+      </span>
+	<span class="btn btn-default btn-file">
+        Bucket Code <input type="text" name="bucket_code">
+      </span>
+	<input type="submit" value="Submit details" class="btn btn-primary">
+  </form>
+
+
+</header>
+
+</body>
+</html>

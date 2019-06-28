@@ -1,0 +1,21 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Organisation</title>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/app.css') }}">
+</head>
+
+<body>
+<header class="navbar">
+  <form action="/org_deletes" method="post" enctype="multipart/form-data" >
+      <span class="btn btn-default btn-file">
+        Org Code <input type="text" name="code">
+      </span>
+	<input type="submit" value="Submit" class="btn btn-primary">
+  </form>
+
+
+</header>
+
+</body>
+</html>
