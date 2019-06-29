@@ -514,8 +514,8 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
         # face_dst = bucket_path + '/' + camera_code + '_faces/' + crop_name + '.jpg'
 
         txn_face_id = str(add_new_face_txn(txn_img_id, txn_obj_id, oid, bucket_id, camera_id, time)[1]).zfill(10)
-        face_dst = bucket_path + '/' + camera_code + '_faces/' + txn_face_id + '_' + crop_name + '.jpg'
-        face_dst_rel = bucket_path_rel + '/' + camera_code + '_faces/' + txn_face_id + '_' + crop_name + '.jpg'
+        face_dst = bucket_path + '/' + camera_code + '_faces/' + txn_face_id + '.jpg'
+        face_dst_rel = bucket_path_rel + '/' + camera_code + '_faces/' + txn_face_id + '.jpg'
         source = crop_face_path
         update_info(s_txn_face_table, s_txface_id, txn_face_id, s_txface_path, face_dst_rel)
 
