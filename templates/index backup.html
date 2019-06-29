@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sightengine demo - Python and Flask</title>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/app.css') }}">
+</head>
+
+<body>
+<style>
+a:link, a:visited {
+  background-color: #808080;
+  color: white;
+  padding: 10px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+a:hover, a:active {
+  background-color: red;
+}
+</style>
+<header class="navbar">
+
+  <form action="/upload" method="post" enctype="multipart/form-data" >
+      <span class="btn btn-default btn-file">
+        Browse <input type="file" name="image">
+      </span>
+	
+    <input type="submit" value="Upload your image" class="btn btn-primary">
+  </form>
+
+  <form action="/org">
+	<a href= {{ url_for('org_create') }}>Create Organisation</a>
+  </form>
+
+    <form action="/user">
+	<a href= {{ url_for('user_create') }}>Create User</a>
+	  </form>
+
+   <form action="/bucket">
+	<a href= {{ url_for('bucket_create') }}>Create Bucket</a>
+  </form>
+
+  <form action="/org">
+	<a href= {{ url_for('org_delete') }}>Delete Organisation</a>
+  </form>
+
+    <form action="/user">
+	<a href= {{ url_for('user_delete') }}>Delete User</a>
+  </form>
+
+   <form action="/bucket">
+	<a href= {{ url_for('bucket_delete') }}>Delete Bucket</a>
+  </form>
+
+    <form action="/camera">
+	<a href= {{ url_for('camera_create') }}>Create Camera</a>
+  </form>
+
+
+   <form action="/camera">
+	<a href= {{ url_for('camera_delete') }}>Delete Camera</a>
+  </form>
+
+	<a href="http://192.168.1.244:5003">go to </a>
+
+</header>
+
+</body>
+</html>

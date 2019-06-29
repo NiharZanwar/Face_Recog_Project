@@ -1,27 +1,26 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory
-import time
+from flask import Flask, render_template, request, redirect, url_for
 import datetime
+from Final_Project import sql_connection, extract_info, verify_user, errordict, get_datetime, input_image, full_img_txn
 import Final_Project
 import json
 import sys
+import time
 
 app = Flask(__name__)
 
 render_issue = 000
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 
 @app.route('/')
 def login():
-    session.pop('username', None)
     return render_template('upload_photo.html')
 
 
 @app.route('/dashboard', methods=['POST'])
 def login_check():
-    session.pop('username', None)
-    test_connection = Final_Project.sql_connection()
+
+    test_connection = sql_connection()
     if test_connection[0] == 130:
         return redirect(url_for('error', error_str=test_connection[1], error_code=test_connection[0]))
 
@@ -29,28 +28,23 @@ def login_check():
     password = request.form['pass']
     o_code = request.form['org_code']
 
-    check = Final_Project.verify_user(username, password, o_code)
+    check = verify_user(username, password, o_code)
     if check[0] == 205:
-        session['username'] = username
         try:
             return redirect(url_for('login_done', username=username))
         except:
-            return redirect(url_for('error', error_str=sys.exec_info()[1], error_code=render_issue))
+            return redirect(url_for('error', error_str=sys.exc_info()[1], error_code=render_issue))
     else:
         return redirect(url_for('error', error_str=check[1], error_code=check[0]))
 
 
 @app.route('/dashboard/<username>')
-def login_done(username):
-    if 'username' in session:
-        print(username)
-        session.pop('username', None)
-        return render_template('upload_photo.html')
+def login_done():
+    return render_template('upload_photo.html')
 
 
 @app.route('/error/<error_code>/<error_str>')
 def error(error_str, error_code):
-    session.pop('username', None)
     return render_template('error_login.html', error=error_str, error_code=error_code)
 
 
@@ -64,16 +58,16 @@ def upload_file():
     cameracode = request.form['camcode']
     camera_id = cameracode[3:]
 
-    info = Final_Project.extract_info(Final_Project.s_cam_table, Final_Project.s_cam_id, camera_id)[1]
+    info = extract_info(Final_Project.s_cam_table, Final_Project.s_cam_id, camera_id)[1]
 
     if info[0] == 128:
         return redirect(url_for('error', error_str=info[1], error_code=info[0]))
 
     if len(info) == 0:
-        return redirect(url_for('error', error_str=Final_Project.errordict[113], error_code=113))
+        return redirect(url_for('error', error_str=errordict[113], error_code=113))
 
     if str(info[0][Final_Project.s_mrkdel]) == '1':
-        return redirect(url_for('error', error_str=Final_Project.errordict[114], error_code=114))
+        return redirect(url_for('error', error_str=errordict[114], error_code=114))
 
     bucket_id = info[0][Final_Project.s_buc_id]
     oid = info[0][Final_Project.s_org_id]
@@ -86,29 +80,17 @@ def upload_file():
     f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(f)
 
-    time_capture = Final_Project.get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)
+    time_capture = get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)
     if len(time_capture) == 0:
         time_capture = time_now
 
-    img_path = Final_Project.Organisation + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename
-    Final_Project.full_img_txn(imgtxn_id, img_path, time_capture, time_now)
+    img_path = '/Organisations' + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename
+    full_img_txn(imgtxn_id, img_path, time_capture, time_now)
 
-    json1 = Final_Project.input_image(cameracode, time_now, imgtxn_id, bucket_id, oid, camera_id)
+    json1 = input_image(cameracode, time_now, imgtxn_id, bucket_id, oid, camera_id)
     json_2 = json.loads(json1)
     end = time.time()
     time_taken = start - end
-    """
-    sep_path = json_2["Face Data"][0]["File Path"].split('/')
-    i = 1
-    lead = len(sep_path) - 2
-    join_path = ''
-    while i < lead:
-        join_path = join_path + sep_path[i] + '/'
-        i += 1
-    join_path = join_path + sep_path[lead]
-    img_path1 = join_path.replace('/', ':')
-    names = sep_path[lead + 1]
-    """
     res = json.dumps(json_2, indent=4, sort_keys=True) + str(time_taken)
     return render_template('result.html', value=res)
 
@@ -123,16 +105,16 @@ def upload_fil():
     cameracode = request.form['camcode']
     camera_id = cameracode[3:]
 
-    info = Final_Project.extract_info(Final_Project.s_cam_table, Final_Project.s_cam_id, camera_id)[1]
+    info = extract_info(Final_Project.s_cam_table, Final_Project.s_cam_id, camera_id)[1]
 
     if info[0] == 128:
         return redirect(url_for('error', error_str=info[1], error_code=info[0]))
 
     if len(info) == 0:
-        return redirect(url_for('error', error_str=Final_Project.errordict[113], error_code=113))
+        return redirect(url_for('error', error_str=errordict[113], error_code=113))
 
     if str(info[0][Final_Project.s_mrkdel]) == '1':
-        return redirect(url_for('error', error_str=Final_Project.errordict[114], error_code=114))
+        return redirect(url_for('error', error_str=errordict[114], error_code=114))
 
     bucket_id = info[0][Final_Project.s_buc_id]
     oid = info[0][Final_Project.s_org_id]
@@ -145,14 +127,14 @@ def upload_fil():
     f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(f)
 
-    time_capture = Final_Project.get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)
+    time_capture = get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)
     if len(time_capture) == 0:
         time_capture = time_now
 
-    img_path = Final_Project.Organisation + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename
-    Final_Project.full_img_txn(imgtxn_id, img_path, time_capture, time_now)
+    img_path = '/Organisations/' + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename
+    full_img_txn(imgtxn_id, img_path, time_capture, time_now)
 
-    json1 = Final_Project.input_image(cameracode, time_now, imgtxn_id, bucket_id, oid, camera_id)
+    json1 = input_image(cameracode, time_now, imgtxn_id, bucket_id, oid, camera_id)
     json_2 = json.loads(json1)
     end = time.time()
     time_taken = start - end
