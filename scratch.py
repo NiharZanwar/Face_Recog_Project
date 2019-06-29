@@ -1,15 +1,5 @@
 from flask import Flask, render_template, request, send_from_directory
-import pymysql
-
-
-def sql_connection():
-    connection = pymysql.connect(host='192.168.1.222',
-                                 user='Sparsh',
-                                 password='Nihar@123',
-                                 db='FaceData',
-                                 charset='utf8mb4',
-                                 cursorclass=pymysql.cursors.DictCursor)
-    return connection
+from Final_Project import sql_connection
 
 
 app = Flask(__name__)
@@ -32,7 +22,7 @@ def change_request():
     table_name = request.form['table_name']
     is_duplicate = request.form['Duplicate']
     times_visited = request.form['Times_Visited']
-    with sql_connection().cursor() as cursor:
+    with sql_connection()[1].cursor() as cursor:
         cursor.execute("SELECT * FROM {} where `oid` = {}".format(table_name, oid))
         field_names = [i[0] for i in cursor.description]
         if times_visited == "":
@@ -48,7 +38,6 @@ def change_request():
                                                                                           times_visited))
                     break
             if (is_duplicate != "") & (k == 0):
-                k = 0
                 if 'isduplicate' in field_names:
                     cursor.execute("SELECT * FROM {} where `oid` = {} and `isduplicate` = {}".format(table_name, oid,
                                                                                                      is_duplicate))
@@ -57,15 +46,6 @@ def change_request():
                 return render_template('ind.html', data=cursor, field=field_names, path1=i, o_id=oid, tables=table_name)
             return render_template('ind.html', data=cursor, field=field_names, path1='None', o_id=oid,
                                    tables=table_name)
-
-
-"""
-def is_none(n):
-    if type(n) == 'NoneType':
-        return True
-    else:
-        return False
-"""
 
 
 @app.route('/photo/<path:filename>')
@@ -83,74 +63,5 @@ def download_file(filename):
     return send_from_directory(join_path, n, as_attachment=True)
 
 
-"""
-ql_query(id_type, i_d, from_dt, to_dt):
-    connection = sql_connection()[1]
-    with connection.cursor() as cursor:
-        query = "SELECT * from tx_face_id where {} = '{}'" \
-                 " and timecapture between '{}' and '{}'".format(id_type, i_d, from_dt, to_dt)
-        cursor.execute(query)
-        result = cursor.fetchall()
-        return result
-"""
-"""
-app = Flask(__name__)
-app.config['SECRET_KEY'] = "my precious"
-
-extra = ['Product_Type', 'Geography', 'Third']
-
-
-@app.route("/category", methods=["GET", "POST"])
-def index():
-"""
-"""Render form and handle form submission"""
-"""
-    form = TestForm(request.form)
-    form.category_1.choices = [('', 'Select a Category')] + [(x) for x in enumerate(extra,1)]
-    chosen_category_1 = None
-    chosen_category_2 = None
-    chosen_category_3 = None
-    return render_template('index.html', form=form)
-
-@app.route("/category/<int:category_1_id>/", methods=["POST"])
-def get_request(category_1_id):
-    data = [(x) for x in enumerate(extra,1)
-        if x[0] != category_1_id]
-    response = make_response(json.dumps(data))
-    response.content_type = 'application/json'
-    return response
-
-foodList = ['76', '87', '78']
-foodKind = ['delhi', 'suxxex']
-
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    # foodList = [ i.type for i in db.session.query(FoodType)]
-    return render_template('killer.html', food=foodList)
-
-
-@app.route('/foodkind', methods=['GET', 'POST'])
-def foodkind():
-        selection = request.form['foodChoice']
-        # foodKind = [ i.kind for i in db.session.query(FoodType).filter(FoodKind == selection)]
-        return render_template('killer.html', foodChoice=foodKind)
-
-
-food = {
-    'fruit': ['apple', 'banana', 'cherry'],
-    'vegetables': ['onion', 'cucumber'],
-    'meat': ['sausage', 'beef'],
-}
-
-
-@app.route('/get_food/<foodkind>')
-def get_food(foodkind):
-    if foodkind not in food:
-        return jsonify([])
-    else:
-        return jsonify(food[foodkind])
-
-"""
 if __name__ == '__main__':
     app.run(host='192.168.1.206', debug=True, port=5000, threaded=True)

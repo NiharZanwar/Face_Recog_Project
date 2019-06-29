@@ -1,40 +1,18 @@
-import pymysql.cursors
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image as Im
 import datetime
 from PIL import Image
 import os
 import psutil
-from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
+from Final_Project import sql_connection
+
 
 height = 100
 width = 100
 
-border = Border(left=Side(border_style='medium', color='99999999'),
-                right=Side(border_style='medium', color='99999999'),
-                top=Side(border_style='medium', color='99999999'),
-                bottom=Side(border_style='medium', color='99999999'),
-                diagonal=Side(border_style='medium', color='99999999'),
-                diagonal_direction=0, outline=Side(border_style='medium', color='99999999'),
-                vertical=Side(border_style='medium', color='99999999'),
-                horizontal=Side(border_style='medium', color='99999999')
-                )
 
 if not os.path.exists(os.getcwd() + '/report_xls'):
     os.mkdir(os.getcwd() + '/report_xls')
-
-
-def sql_connection():
-    try:
-        connection = pymysql.connect(host='192.168.1.222',
-                                     user='Sparsh',
-                                     password='Nihar@123',
-                                     db='FaceData',
-                                     charset='utf8mb4',
-                                     cursorclass=pymysql.cursors.DictCursor)
-        return 1, connection
-    except pymysql.err.OperationalError:
-        return 0, 0
 
 
 def has_handle(fpath):
@@ -43,7 +21,7 @@ def has_handle(fpath):
             for item in proc.open_files():
                 if fpath == item.path:
                     return True
-        except Exception:
+        except:
             pass
 
     return False
@@ -91,7 +69,7 @@ def generate_xls(id_type, i_d, from_dt, to_dt):
         if length != 0:
             img_path_rel = result[row-2]['path']
             img_path_abs = '/home/sparsh/Desktop/Trial' + img_path_rel
-            temp_path = os.getcwd()+'/temp'+ str(row) + '.jpg'
+            temp_path = os.getcwd()+'/temp' + str(row) + '.jpg'
             img = Image.open(img_path_abs)
             img = img.resize((width, height), Image.NEAREST)
             img.save(temp_path)
@@ -123,9 +101,3 @@ def sql_query(id_type, i_d, from_dt, to_dt):
         cursor.execute(query)
         result = cursor.fetchall()
         return result
-
-
-#generate_xls('oid', '95', '2019-06-25 16:42:36', '2019-06-26 17:43:32')
-
-
-
