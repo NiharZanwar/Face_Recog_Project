@@ -1,8 +1,8 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for
 import datetime
-from Final_Project import sql_connection, extract_info, verify_user, errordict, get_datetime, input_image, full_img_txn
-import Final_Project
+from functions import sql_connection, extract_info, verify_user, errordict, get_datetime, input_image, full_img_txn
+import functions
 import json
 import sys
 import time
@@ -58,7 +58,7 @@ def upload_file(username):
     cameracode = request.form['camcode']
     camera_id = cameracode[3:]
 
-    info = extract_info(Final_Project.s_cam_table, Final_Project.s_cam_id, camera_id)[1]
+    info = extract_info(functions.s_cam_table, functions.s_cam_id, camera_id)[1]
 
     if info[0] == 128:
         return redirect(url_for('error', error_str=info[1], error_code=info[0]))
@@ -66,21 +66,21 @@ def upload_file(username):
     if len(info) == 0:
         return redirect(url_for('error', error_str=errordict[113], error_code=113))
 
-    if str(info[0][Final_Project.s_mrkdel]) == '1':
+    if str(info[0][functions.s_mrkdel]) == '1':
         return redirect(url_for('error', error_str=errordict[114], error_code=114))
 
-    bucket_id = info[0][Final_Project.s_buc_id]
-    oid = info[0][Final_Project.s_org_id]
+    bucket_id = info[0][functions.s_buc_id]
+    oid = info[0][functions.s_org_id]
     bucket_code = 'BUC' + str(bucket_id).zfill(9)
     o_code = 'ORG' + str(oid).zfill(5)
 
     file = request.files['image']
-    imgtxn_id = str((Final_Project.initial_transaction(bucket_id, oid, camera_id))[1]).zfill(10)
+    imgtxn_id = str((functions.initial_transaction(bucket_id, oid, camera_id))[1]).zfill(10)
     file.filename = (imgtxn_id + '_' + time_now + '.jpg').replace(' ', '_')
     f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(f)
 
-    time_capture = get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)
+    time_capture = get_datetime(functions.dir_path + functions.temp_img_dir + file.filename)
     if len(time_capture) == 0:
         time_capture = time_now
 
@@ -105,7 +105,7 @@ def upload_fil():
     cameracode = request.form['camcode']
     camera_id = cameracode[3:]
 
-    info = extract_info(Final_Project.s_cam_table, Final_Project.s_cam_id, camera_id)[1]
+    info = extract_info(functions.s_cam_table, functions.s_cam_id, camera_id)[1]
 
     if info[0] == 128:
         return redirect(url_for('error', error_str=info[1], error_code=info[0]))
@@ -113,21 +113,21 @@ def upload_fil():
     if len(info) == 0:
         return redirect(url_for('error', error_str=errordict[113], error_code=113))
 
-    if str(info[0][Final_Project.s_mrkdel]) == '1':
+    if str(info[0][functions.s_mrkdel]) == '1':
         return redirect(url_for('error', error_str=errordict[114], error_code=114))
 
-    bucket_id = info[0][Final_Project.s_buc_id]
-    oid = info[0][Final_Project.s_org_id]
+    bucket_id = info[0][functions.s_buc_id]
+    oid = info[0][functions.s_org_id]
     bucket_code = 'BUC' + str(bucket_id).zfill(9)
     o_code = 'ORG' + str(oid).zfill(5)
 
     file = request.files['image']
-    imgtxn_id = str((Final_Project.initial_transaction(bucket_id, oid, camera_id))[1]).zfill(10)
+    imgtxn_id = str((functions.initial_transaction(bucket_id, oid, camera_id))[1]).zfill(10)
     file.filename = (imgtxn_id + '_' + time_now + '.jpg').replace(' ', '_')
     f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(f)
 
-    time_capture = get_datetime(Final_Project.dir_path + Final_Project.temp_img_dir + file.filename)
+    time_capture = get_datetime(functions.dir_path + functions.temp_img_dir + file.filename)
     if len(time_capture) == 0:
         time_capture = time_now
 

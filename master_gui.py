@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 import datetime
-from Final_Project import extract_info, add_new_bucket, add_new_camera, add_new_org, sql_connection, del_bucket, \
+from functions import extract_info, add_new_bucket, add_new_camera, add_new_org, sql_connection, del_bucket, \
     del_camera, del_org, del_user, create_new_user, initialization
 import sys
 from details import forms, org_form, camera_form, user_form, bucket_form

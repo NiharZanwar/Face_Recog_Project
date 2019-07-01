@@ -431,6 +431,7 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id, time_c
     :param bucket_id: Bucket ID of the camera
     :param oid: Organisation ID of the camera
     :param camera_id: Camera ID
+    :param time_capture: Time it was actually captured
     :return: JSON output of details
     """
 
