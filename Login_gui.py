@@ -87,7 +87,7 @@ def upload_file():
     img_path = '/Organisations' + o_code + '/' + bucket_code + '/' + cameracode + '_dump/' + file.filename
     full_img_txn(imgtxn_id, img_path, time_capture, time_now)
 
-    json1 = input_image(cameracode, time_now, imgtxn_id, bucket_id, oid, camera_id)
+    json1 = input_image(cameracode, time_now, imgtxn_id, bucket_id, oid, camera_id, time_capture)
     json_2 = json.loads(json1)
     end = time.time()
     time_taken = start - end
@@ -143,4 +143,4 @@ def upload_fil():
 
 
 if __name__ == '__main__':
-    app.run(host='192.168.1.206', debug=True, port=5006, threaded=True)
+    app.run(host='192.168.1.222', debug=True, port=5006, threaded=True)
