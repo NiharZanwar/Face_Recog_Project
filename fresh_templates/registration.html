@@ -1,0 +1,21 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Registration</title>
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/app.css') }}">
+</head>
+
+<body>
+<header class="navbar">
+  <form action="{{ url_for(form_redirect) }}" method="post" enctype="multipart/form-data" >
+       {% for val in formreq %}
+	<span class="btn btn-default btn-file">
+        {{ val }} <input type="text" name="{{ val }}">
+      	</span>
+	{% endfor %}
+	<input type="submit" value="Submit details" class="btn btn-primary">
+  </form>
+</header>
+
+</body>
+</html>
