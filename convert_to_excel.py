@@ -4,7 +4,7 @@ import datetime
 from PIL import Image
 import os
 import psutil
-from Final_Project import sql_connection
+from functions import sql_connection
 
 
 height = 100

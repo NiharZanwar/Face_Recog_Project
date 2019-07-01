@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, send_from_directory
 from convert_to_excel import generate_xls
-from Final_Project import sql_connection
+from functions import sql_connection
 
 app = Flask(__name__)
 connection = sql_connection()
