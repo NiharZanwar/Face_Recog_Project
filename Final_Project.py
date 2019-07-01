@@ -422,11 +422,11 @@ def verify_user(user_name, pass_word, o_code):
     return 205, errordict[205]
 
 
-def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
+def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id, time_capture):
     """
     To input the image captured by the camera
     :param camera_code: Camera Code
-    :param time: Time it was received
+    :param time: Time it was received and NOTE it is not the time it was captured
     :param txn_img_id: Transaction ID of the image
     :param bucket_id: Bucket ID of the camera
     :param oid: Organisation ID of the camera
@@ -452,9 +452,12 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
     face_locations = face_recognition.face_locations(image, number_of_times_to_upsample=1)
     print("detected {} face(s) in this photograph.-{}".format(len(face_locations), txn_img_id + '_' +
                                                               time.replace(' ', '_') + '.jpg'))
-
-    dump_path = bucket_path + '/' + camera_code + '_dump/' + txn_img_id + '_' + time.replace(' ', '_') + '.jpg'
-    dump_path_rel = bucket_path_rel + '/' + camera_code + '_dump/' + txn_img_id + '_' + time.replace(' ', '_') + '.jpg'
+    
+    date_capture = time_capture.split(' ')[0]
+    if date_capture not in listdir(bucket_path + '/' + camera_code + '_dump/'):
+        mkdir(bucket_path + '/' + camera_code + '_dump/' + date_capture)
+    dump_path = bucket_path + '/' + camera_code + '_dump/' + date_capture + '/' + txn_img_id + '.jpg'
+    dump_path_rel = bucket_path_rel + '/' + camera_code + '_dump/' + date_capture + '/' + txn_img_id + '.jpg'
 
     update_info(s_txn_img_table, s_tximg_id, txn_img_id, s_face_count, len(face_locations))
 
@@ -510,12 +513,12 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id):
                 break
             else:
                 k = 1
-
-        # face_dst = bucket_path + '/' + camera_code + '_faces/' + crop_name + '.jpg'
-
+        
+        if date_capture not in listdir(bucket_path + '/' + camera_code + '_faces/'):
+            mkdir(bucket_path + '/' + camera_code + '_faces/' + date_capture)
         txn_face_id = str(add_new_face_txn(txn_img_id, txn_obj_id, oid, bucket_id, camera_id, time)[1]).zfill(10)
-        face_dst = bucket_path + '/' + camera_code + '_faces/' + txn_face_id + '.jpg'
-        face_dst_rel = bucket_path_rel + '/' + camera_code + '_faces/' + txn_face_id + '.jpg'
+        face_dst = bucket_path + '/' + camera_code + '_faces/' + date_capture + '/' + txn_face_id + '.jpg'
+        face_dst_rel = bucket_path_rel + '/' + camera_code + '_faces/' + date_capture + '/' + txn_face_id + '.jpg'
         source = crop_face_path
         update_info(s_txn_face_table, s_txface_id, txn_face_id, s_txface_path, face_dst_rel)
 
