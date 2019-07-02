@@ -100,5 +100,5 @@ def sql_query(id_type, i_d, from_dt, to_dt):
                  " and timecapture between '{}' and '{}'".format(id_type, i_d, from_dt, to_dt)
         cursor.execute(query)
         result = cursor.fetchall()
-        
+        print('Hi')
         return result
