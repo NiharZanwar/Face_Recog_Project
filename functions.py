@@ -65,10 +65,10 @@ def sql_connection():
     :return: It returns two values, 1) Error/success codes 2) connection pointer
     """
     try:
-        connection = pymysql.connect(host=hostname,
-                                     user=username,
-                                     password=password,
-                                     db=database,
+        connection = pymysql.connect(host=hostname,      # hostname of MySQL Connection
+                                     user=username,      # username of MySQL Connection
+                                     password=password,  # password of MySQL Connection
+                                     db=database,        # database of MySQL Connection
                                      charset=charset,
                                      cursorclass=pymysql.cursors.DictCursor)
         return 230, connection
@@ -82,13 +82,13 @@ def initialization():
     :return: Nothing. Just creates directory
     """
     if not path.exists(dir_path + temp_img_dir):
-        mkdir(dir_path + temp_img_dir)
+        mkdir(dir_path + temp_img_dir)              # Creating directory 'temp_img_dir'
 
     if not path.exists(dir_path + Organisation):
-        mkdir(dir_path + Organisation)
+        mkdir(dir_path + Organisation)              # Creating directory 'Organisations'
 
     if not path.exists(dir_path + ManualImageDump):
-        mkdir(dir_path + ManualImageDump)
+        mkdir(dir_path + ManualImageDump)           # Creating directory 'ManualImageDump'
 
 
 def extract_info(table, id_name, i_d):
@@ -100,10 +100,10 @@ def extract_info(table, id_name, i_d):
     :return: It returns two elements. First is error/success code
         Secondly, All the rows from the table having 'id_name' = 'i_d' as a list containing specific rows as dictionary.
     """
-
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
         try:
+            # MySQL query to extract all rows from table for id_name = i_d
             cursor.execute("SELECT * FROM {} WHERE {} = '{}'".format(table, id_name, i_d))
             rows = cursor.fetchall()
             return 228, rows
@@ -111,46 +111,46 @@ def extract_info(table, id_name, i_d):
             return 128, sys.exc_info()[1]
 
 
-def add_new_camera(cameraname, bucketcode, cameratype, createddatetime):
+def add_new_camera(camera_name, bucket_code, camera_type, created_date_time):
     """
     To add a new camera to the database and create the folders accordingly
-    :param cameraname: Name of the camera entered
-    :param bucketcode: Bucket Code under which the camera is to be created
-    :param cameratype: Type of camera entered
-    :param createddatetime: Date and Time of creation of the camera
+    :param camera_name: Name of the camera entered
+    :param bucket_code: Bucket Code under which the camera is to be created
+    :param camera_type: Type of camera entered
+    :param created_date_time: Date and Time of creation of the camera
     :return: It returns two elements. First is the error/success code and second is the camera code
      Also it creates two folders - 'camera code + _faces' and 'camera code + _dump'
     """
 
-    buc_rows = extract_info(s_buc_table, s_buc_code, bucketcode)[1]
-    buc_id = buc_rows[0][s_buc_id]
-    org_id = buc_rows[0][s_org_id]
-    buc_markdel = buc_rows[0][s_mrkdel]
-    orgcode = extract_info(s_org_table, s_org_id, org_id)[1][0][s_org_code]
+    buc_rows = extract_info(s_buc_table, s_buc_code, bucket_code)[1]     # To extract all rows s_buc_code = bucket_code
+    buc_id = buc_rows[0][s_buc_id]                                       # BucketID
+    org_id = buc_rows[0][s_org_id]                                       # OrganisationID
+    buc_mark_delete = buc_rows[0][s_mrkdel]                              # Bucket Mark Delete
+    org_code = extract_info(s_org_table, s_org_id, org_id)[1][0][s_org_code]    # Org Code for s_org_id = org_id
 
-    if buc_markdel == 1:
-        return 102, errordict[102]
+    if buc_mark_delete == 1:
+        return 102, errordict[102]          # If bucket is disabled
 
     connection = sql_connection()[1]
     try:
         with connection.cursor() as cursor:
-            cursor.callproc('create_camera', [cameraname, buc_id, cameratype, org_id, createddatetime])
-            cam_id = cursor.fetchall()[0]['id']
+            # Calling 'create_camera' MySQL procedure to add a new camera
+            cursor.callproc('create_camera', [camera_name, buc_id, camera_type, org_id, created_date_time])
+            cam_id = cursor.fetchall()[0]['id']     # Camera ID of the added camera
     except:
         return 121, sys.exc_info()[1]
 
     try:
-        camera_code = 'CAM' + str(cam_id).zfill(9)  # BUCKET code format
-        update_info(s_cam_table, s_cam_id, cam_id, s_cam_code, camera_code)
+        camera_code = 'CAM' + str(cam_id).zfill(9)  # Creating camera code of the camera added
+        update_info(s_cam_table, s_cam_id, cam_id, s_cam_code, camera_code)     # Updating camera code
     except:
         return 122, sys.exc_info()[1]
 
     try:
-        camera_faces_path = dir_path + Organisation + orgcode + '/' + bucketcode + '/' + camera_code + '_faces'
-        mkdir(camera_faces_path)
-        camera_dump_path = dir_path + Organisation + orgcode + '/' + bucketcode + '/' + camera_code + '_dump'
-        mkdir(camera_dump_path)
-
+        camera_faces_path = dir_path + Organisation + org_code + '/' + bucket_code + '/' + camera_code + '_faces'
+        mkdir(camera_faces_path)        # Creating directory 'CAM?????????_faces' (camera_code + '_faces')
+        camera_dump_path = dir_path + Organisation + org_code + '/' + bucket_code + '/' + camera_code + '_dump'
+        mkdir(camera_dump_path)         # Creating directory 'CAM?????????_dump'  (camera_code + '_dump')
     except:
         return 123, sys.exc_info()[1]
 
@@ -168,26 +168,24 @@ def add_new_org(org_name, org_logo, org_email, created_date_time, org_key):
     :return: It returns two elements. First is the error/success code and second is the organisation code
      Also it creates a folder - org code
     """
-
-    ad = [org_name, org_logo, org_email, created_date_time, org_key]
     connection = sql_connection()[1]
     try:
         with connection.cursor() as cursor:
-
-            cursor.callproc('create_organisation', ad)
-            org_id = cursor.fetchall()[0]['id']
+            # Calling 'create_organisation' procedure to add a new organisation
+            cursor.callproc('create_organisation', [org_name, org_logo, org_email, created_date_time, org_key])
+            org_id = cursor.fetchall()[0]['id']     # Org ID of the added organisation
     except:
         return 118, sys.exc_info()[1]
 
     try:
-        org_code = 'ORG' + str(org_id).zfill(5)  # BUCKET code format
-        update_info(s_org_table, s_org_id, org_id, s_org_code, org_code)
+        org_code = 'ORG' + str(org_id).zfill(5)  # Creating organisation code of the organisation added
+        update_info(s_org_table, s_org_id, org_id, s_org_code, org_code)    # Updating organisation code
     except:
         return 119, sys.exc_info()[1]
 
     try:
         org_path = dir_path + Organisation + org_code
-        mkdir(org_path)
+        mkdir(org_path)     # Creating directory 'ORG?????' (org_code)
     except:
         return 120, sys.exc_info()[1]
 
@@ -203,59 +201,59 @@ def add_new_bucket(bucket_name, created_date_time, buc_org_code):
     :return: It returns two elements. First is the error/success code and second is the bucket code
      Also it creates folders - bucket code, 'numpy_arrays', 'error_faces', 'unique_faces'
     """
-
+    # Extracting all rows from 'organisations' for s_org_code = buc_org_code
     org_rows = extract_info(s_org_table, s_org_code, buc_org_code)[1]
-    org_id = org_rows[0][s_org_id]
-    org_markdel = org_rows[0][s_mrkdel]
+    org_id = org_rows[0][s_org_id]      # Organisation ID for s_org_code = buc_org_code
+    org_mark_delete = org_rows[0][s_mrkdel]
 
-    if org_markdel == 1:
-        return 105, errordict[105]
+    if org_mark_delete == 1:
+        return 105, errordict[105]      # If bucket is disabled
 
     connection = sql_connection()[1]
     try:
         with connection.cursor() as cursor:
-
+            # Calling 'create_bucket' procedure to add a new bucket
             cursor.callproc('create_bucket', [bucket_name, created_date_time, org_id])
-            buc_id = cursor.fetchall()[0]['id']
+            buc_id = cursor.fetchall()[0]['id']      # Bucket ID of the added bucket
     except:
         return 115, sys.exc_info()[1]
 
     try:
-        bucket_code = 'BUC' + str(buc_id).zfill(9)  # BUCKET code format
-        update_info(s_buc_table, s_buc_id, buc_id, s_buc_code, bucket_code)
+        bucket_code = 'BUC' + str(buc_id).zfill(9)  # Creating bucket code of the bucket added
+        update_info(s_buc_table, s_buc_id, buc_id, s_buc_code, bucket_code)     # Updating bucket code
     except:
         return 116, sys.exc_info()[1]
 
     try:
         bucket_path = dir_path + Organisation + buc_org_code + '/' + bucket_code
-        mkdir(bucket_path)
+        mkdir(bucket_path)      # Creating directory 'BUC?????????' (bucket_code)
         numpy_arrays_path = bucket_path + numpy_arrays
-        mkdir(numpy_arrays_path)
+        mkdir(numpy_arrays_path)    # Creating directory 'numpy_arrays'
         unique_faces_path = bucket_path + unique_dir
-        mkdir(unique_faces_path)
+        mkdir(unique_faces_path)    # Creating directory 'unique_faces'
         error_faces_path = bucket_path + error_enc_dir
-        mkdir(error_faces_path)
+        mkdir(error_faces_path)     # Creating directory 'error_faces'
     except:
         return 117, sys.exc_info()[1]
 
     return 204, bucket_code
 
 
-def add_new_faceid(personid, facepath, img_id, org_id, bucket_id):
+def add_new_face_id(person_id, face_path, img_id, org_id, bucket_id):
     """
-    To add a new face in faceinfo table and assign a faceid to it
-    :param personid: Person ID of the face detected
-    :param facepath: Path of the face
+    To add a new face in 'faceinfo' table and assign a faceid to it
+    :param person_id: Person ID of the face detected
+    :param face_path: Path of the face
     :param img_id: Image ID of the image from which the face was detected
     :param org_id: Organisation ID of the camera which detected the face
     :param bucket_id: Bucket ID of the camera which detected the face
     :return: FaceID
     """
-
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        cursor.callproc('new_face', [personid, facepath, img_id, org_id, bucket_id])
-        face_id = cursor.fetchall()[0]['id']
+        # Calling 'new_face' MySQL procedure to add a new face
+        cursor.callproc('new_face', [person_id, face_path, img_id, org_id, bucket_id])
+        face_id = cursor.fetchall()[0]['id']        # Fetching faceid of the face added
     return face_id
 
 
@@ -271,8 +269,11 @@ def del_org(org_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
+        # To set 'markdelete' = 1 in 'organisation' table
         cursor.execute(sql_del.format(s_org_table, s_mrkdel, s_org_id, org_id))
+        # To set 'markdelete' = 1 in 'orgbucket' table
         cursor.execute(sql_del.format(s_buc_table, s_mrkdel, s_org_id, org_id))
+        # To set 'markdelete' = 1 in 'orgCamera' table
         cursor.execute(sql_del.format(s_cam_table, s_mrkdel, s_org_id, org_id))
         connection.commit()
 
@@ -286,8 +287,11 @@ def renew_org(org_id):
 
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
+        # To set 'markdelete' = 0 in 'organisation' table
         cursor.execute(sql_renew.format(s_org_table, s_mrkdel, s_org_id, org_id))
+        # To set 'markdelete' = 0 in 'orgbucket table
         cursor.execute(sql_renew.format(s_buc_table, s_mrkdel, s_org_id, org_id))
+        # To set 'markdelete' = 0 in 'orgCamera' table
         cursor.execute(sql_renew.format(s_cam_table, s_mrkdel, s_org_id, org_id))
         connection.commit()
 
@@ -300,7 +304,9 @@ def del_bucket(bucket_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
+        # To set 'markdelete' = 1 in 'orgbucket' table
         cursor.execute(sql_del.format(s_buc_table, s_mrkdel, s_buc_id, bucket_id))
+        # To set 'markdelete' = 1 in 'orgCamera' table
         cursor.execute(sql_del.format(s_cam_table, s_mrkdel, s_buc_id, bucket_id))
         connection.commit()
 
@@ -313,7 +319,9 @@ def renew_bucket(bucket_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
+        # To set 'markdelete' = 0 in 'orgbucket' table
         cursor.execute(sql_renew.format(s_buc_table, s_mrkdel, s_buc_id, bucket_id))
+        # To set 'markdelete' = 0 in 'orgCamera' table
         cursor.execute(sql_renew.format(s_cam_table, s_mrkdel, s_buc_id, bucket_id))
         connection.commit()
 
@@ -326,6 +334,7 @@ def del_camera(camera_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
+        # To set 'markdelete' = 1 in 'orgCamera' table
         cursor.execute(sql_del.format(s_cam_table, s_mrkdel, s_cam_id, camera_id))
         connection.commit()
 
@@ -339,6 +348,7 @@ def renew_camera(camera_id):
 
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
+        # To set 'markdelete' = 0 in 'orgCamera' table
         cursor.execute(sql_renew.format(s_cam_table, s_mrkdel, s_cam_id, camera_id))
         connection.commit()
 
@@ -352,6 +362,7 @@ def del_user(user_id):
 
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
+        # To set 'markdelete' = 1 in 'orgUser' table
         cursor.execute(sql_del.format(s_usr_table, s_mrkdel, s_usr_id, user_id))
         connection.commit()
 
@@ -364,28 +375,30 @@ def renew_user(user_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
+        # To set 'markdelete' = 0 in 'orgUser' table
         cursor.execute(sql_renew.format(s_usr_table, s_mrkdel, s_usr_id, user_id))
         connection.commit()
 
 
-def create_new_user(user_name, pass_word, email, createddatetime, oid, displayname):
+def create_new_user(user_name, pass_word, email, created_date_time, oid, display_name):
     """
     To create a new user and add the corresponding details to the database
     :param user_name: Username entered
     :param pass_word: Password entered
     :param email: Email entered
-    :param createddatetime: Date and Time of creation of the user
+    :param created_date_time: Date and Time of creation of the user
     :param oid: Organisation ID under which the user is registered
-    :param displayname: Display name entered
+    :param display_name: Display name entered
     :return: It returns two elements. First is the error/success code. Second is error/success string
     """
 
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
+        # MySQL query to add a new user
         sql = "INSERT INTO `orgUser` (`username`, `userpassword`,`useremail`,`createddatetime`,`oid`,`displayname`) " \
               "VALUES (%s, %s, %s, %s, %s, %s)"
         try:
-            cursor.execute(sql, (user_name, pass_word, email, createddatetime, oid, displayname))
+            cursor.execute(sql, (user_name, pass_word, email, created_date_time, oid, display_name))
             connection.commit()
             return 212, errordict[212]
         except:
@@ -400,7 +413,7 @@ def verify_user(user_name, pass_word, o_code):
     :param o_code: Organisation Code entered
     :return: It returns two elements. First is the error/success code. Second is error/success string
     """
-
+    # Extracting org code from org id
     oid = int(o_code.replace('ORG', ''))
     info_org = extract_info(s_org_table, s_org_code, o_code)[1]
 
@@ -535,7 +548,7 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id, time_c
             duplicate = 0
             times_visited = 1
             person_id = add_person(face_dst_rel, oid)
-            face_id = str(add_new_faceid(person_id, face_dst_rel, txn_img_id, oid, bucket_id)).zfill(8)
+            face_id = str(add_new_face_id(person_id, face_dst_rel, txn_img_id, oid, bucket_id)).zfill(8)
             unique_id = face_id + '_1'
             numpy.save(numpy_dir_path + unique_id, current_img_enc)
             destination = bucket_path + unique_dir + unique_id + '.jpg'
@@ -596,8 +609,9 @@ def input_image(camera_code, time, txn_img_id, bucket_id, oid, camera_id, time_c
 def to_json(json_input, name, face_id, timestamp, txn_img_id, top, bottom, left, right, person_id, org_name, org_code,
             file_path, times_visited, bucket_name, bucket_code, camera, is_duplicate, dump_path, stored, txn_obj_id,
             txn_face_id):
-
+    # Convert JSON to dictionary
     json_input_dict = json.loads(json_input)
+    # Store the contents of 'Face Data' in a list
     list_old = json_input_dict['Face Data']
     i = len(list_old)
 
@@ -628,10 +642,10 @@ def to_json(json_input, name, face_id, timestamp, txn_img_id, top, bottom, left,
          }
     ]
 
-    json_input_dict['Face Data'] = list_new + list_old
-    json_input_dict['Dump Path'] = dump_path
-    json_input_dict['No of faces encoded'] += 1
-    json_append = json.dumps(json_input_dict, indent=5, sort_keys=False)
+    json_input_dict['Face Data'] = list_new + list_old   # Updating the contents of the list
+    json_input_dict['Dump Path'] = dump_path             # Updating the path of the image
+    json_input_dict['No of faces encoded'] += 1          # Incrementing the no of faces encoded
+    json_append = json.dumps(json_input_dict, indent=5, sort_keys=False)    # Converting the dictionary to JSON
 
     return json_append
 
@@ -646,10 +660,10 @@ def update_info(table, id_name, i_d, column, data):
     :param data: Value of the column to be updated
     :return: Nothing
     """
-
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        sql = "update {} set `{}`='{}' where `{}`={};".format(table, column, data, id_name, i_d)
+        # MySQL query to update contents
+        sql = "UPDATE {} SET `{}`='{}' WHERE `{}`={};".format(table, column, data, id_name, i_d)
         cursor.execute(sql)
         connection.commit()
 
@@ -673,7 +687,7 @@ def get_datetime(fn):
             final = temp[0].replace(':', '-') + ' ' + temp[1]
         except:
             try:
-                temp = ret['DateTimeOrignal'].split(' ')
+                temp = ret['DateTimeOriginal'].split(' ')
                 final = temp[0].replace(':', '-') + ' ' + temp[1]
             except:
                 final = sys.exc_info()[1]
@@ -699,13 +713,13 @@ def add_new_obj_txn(txn_img_id, oid, bucket_id, camera_id, time_capture, obj_top
     :param is_face: Whether the object is a face or not
     :return: It returns two values, 1) Error/success codes 2) Object ID
     """
-
     connection = sql_connection()[1]
     try:
         with connection.cursor() as cursor:
+            # Calling 'new_object' MySQL procedure to add a new object
             cursor.callproc('new_object', [txn_img_id, oid, bucket_id, camera_id, time_capture, obj_top, obj_left,
                                            obj_right, obj_down, is_face])
-            obj_id = cursor.fetchall()[0]['id']
+            obj_id = cursor.fetchall()[0]['id']     # Fetching object id of the object added
         return 216, obj_id
     except:
         return 126, sys.exc_info()[1]
@@ -720,8 +734,9 @@ def add_person(face_path, org_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
+        # Calling 'new_person' MySQL procedure to add a new person
         cursor.callproc('new_person', [face_path, org_id])
-        person_id = cursor.fetchall()[0]['id']
+        person_id = cursor.fetchall()[0]['id']      # Fetching person id of the person added
     return person_id
 
 
@@ -736,34 +751,34 @@ def add_new_face_txn(txn_img_id, txn_obj_id, oid, bucket_id, camera_id, time_cap
     :param time_capture: Date and time of capture of face by camera
     :return: It returns two values, 1) Error/success codes 2) Face Transaction ID
     """
-
     connection = sql_connection()[1]
     try:
         with connection.cursor() as cursor:
+            # Calling 'new_txn_face' MySQL procedure to add a new face transaction
             cursor.callproc('new_txn_face', [txn_img_id, txn_obj_id, oid, bucket_id, camera_id, time_capture])
-            txn_face_id = cursor.fetchall()[0]['id']
+            txn_face_id = cursor.fetchall()[0]['id']    # Fetching face_txn_id of the face added
         return 217, txn_face_id
     except:
         return 127, sys.exc_info()[1]
 
 
-def update_face_txn(txn_face_id, faceid, isduplicate, timesvisited, personid):
+def update_face_txn(txn_face_id, face_id, is_duplicate, times_visited, person_id):
     """
     To update the details of a face in tx_face_id table
     :param txn_face_id: Transaction Face ID of the face whose values need to be updated
-    :param faceid: Value of Face ID to be updated
-    :param isduplicate: Value of isduplicate to be updated
-    :param timesvisited: Value of Times Visited to be updated
-    :param personid: Value of Person ID to be updated
+    :param face_id: Value of Face ID to be updated
+    :param is_duplicate: Value of is_duplicate to be updated
+    :param times_visited: Value of Times Visited to be updated
+    :param person_id: Value of Person ID to be updated
     :return: It returns two values, 1) Error/success codes 2) Error/Success string
     """
-
     connection = sql_connection()[1]
     try:
         with connection.cursor() as cursor:
+            # MySQL to update the contents of face_txn whose 'tx_face_id' = txn_face_id
             sql = " UPDATE tx_face_id SET `faceid` = %s, `isduplicate` = %s,`timesvisited` = %s," \
                   " `personid` = %s WHERE `tx_face_id` = %s"
-            cursor.execute(sql, (faceid, isduplicate, timesvisited, personid, txn_face_id))
+            cursor.execute(sql, (face_id, is_duplicate, times_visited, person_id, txn_face_id))
             connection.commit()
         return 219, errordict[219]
     except:
@@ -781,17 +796,18 @@ def initial_transaction(bucket_id, oid, camera_id):
     connection = sql_connection()[1]
     try:
         with connection.cursor() as cursor:
+            # Calling 'new_txn_image' MySQL procedure to add a new image transaction
             cursor.callproc('new_txn_image', [bucket_id, oid, camera_id])
-            img_id = cursor.fetchall()[0]['id']
+            img_id = cursor.fetchall()[0]['id']         # Fetching face_txn_id of the face added
         return 215, img_id
     except:
         return 125, sys.exc_info()[1]
 
 
-def full_img_txn(tx_img_id, img_path, time_capture, time_receive):
+def full_img_txn(txn_img_id, img_path, time_capture, time_receive):
     """
     To update the details of an image
-    :param tx_img_id: Image transaction ID
+    :param txn_img_id: Image transaction ID
     :param img_path: Path of the image
     :param time_capture: Date and time when image was captured/created
     :param time_receive: Date and time when image was received by the system
@@ -800,8 +816,9 @@ def full_img_txn(tx_img_id, img_path, time_capture, time_receive):
     connection = sql_connection()[1]
     try:
         with connection.cursor() as cursor:
+            # MySQL to update the contents of image_txn whose 'tx_img_id' = txn_img_id
             sql = " UPDATE tx_img_id SET `timecapture` = %s, `timereceive`= %s,`path` = %s WHERE `tx_img_id` = %s)"
-            cursor.execute(sql, (time_capture, time_receive, img_path, tx_img_id))
+            cursor.execute(sql, (time_capture, time_receive, img_path, txn_img_id))
             connection.commit()
         return 214, errordict[214]
 
