@@ -14,11 +14,19 @@ render_issue = 000
 
 @app.route('/')
 def home():
+    """
+    To display the login page
+    :return: Displays login page
+    """
     return render_template('login_home.html')
 
 
 @app.route('/dashboard', methods=['POST'])
 def login_check():
+    """
+    Verifies the credentials entered by the user to login and logs in if they are correct
+    :return:
+    """
 
     test_connection = sql_connection()
     if test_connection[0] == 130:
@@ -40,16 +48,33 @@ def login_check():
 
 @app.route('/dashboard/<username>')
 def login_done(username):
+    """
+    This function displays the homepage of a user
+    :param username:
+    :return:
+    """
     return render_template('dashboard.html', username=username)
 
 
 @app.route('/error/<error_code>/<error_str>')
 def error(error_str, error_code):
+    """
+    This function displays any error that occurs during the program and doesn't let the system to crash
+    :param error_str: Code of the error manually assigned or assigned by system
+    :param error_code: Error string manually defined or by system.
+    :return: Displays error code and error string
+    """
+
     return render_template('error.html', error=error_str, error_code=error_code)
 
 
 @app.route('/upload/<username>', methods=['POST'])
 def upload_file(username):
+    """
+    This function takes an image as input and detects the faces in it. Also it updates the database accordingly.
+    :param username: User Name of the user who is uploading the image
+    :return: Displays necessary data as JSON object containing all the necessary details of the faces detected
+    """
     start = time.time()
     upload_folder = os.path.basename('temp_img_dir')
     app.config['UPLOAD_FOLDER'] = upload_folder
@@ -97,6 +122,10 @@ def upload_file(username):
 
 @app.route('/Manual', methods=['POST'])
 def upload_fil():
+    """
+    This function is to manually upload images from a specified folder
+    :return: JSON object containing all the necessary details of the faces detected
+    """
     start = time.time()
     upload_folder = os.path.basename('temp_img_dir')
     app.config['UPLOAD_FOLDER'] = upload_folder

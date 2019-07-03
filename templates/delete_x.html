@@ -1,15 +1,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Delete Camera</title>
+  <title>Delete {{ name }}</title>
   <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/app.css') }}">
 </head>
 
 <body>
 <header class="navbar">
-  <form action="/camera_deletes" method="post" enctype="multipart/form-data" >
+  <form action="{{ url_for(name + '_delete') }}" method="post" enctype="multipart/form-data" >
       <span class="btn btn-default btn-file">
-        Camera Code <input type="text" name="code">
+	{% if 'user' in name %}
+	{{ name }} id <input type="text" name="id">
+	{% else %}
+        {{ name }} code <input type="text" name="code">
+	{% endif %}
       </span>
 	<input type="submit" value="Submit" class="btn btn-primary">
   </form>
