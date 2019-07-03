@@ -20,28 +20,38 @@
 	<link rel="stylesheet" type="text/css" href="static/Table/css/util.css">
 	<link rel="stylesheet" type="text/css" href="static/Table/css/main.css">
 <!--===============================================================================================-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+  $("button").click(function(){
+    var path = $(this).val();
+    var image = "<img src='{{ url_for('download_file', filename='home'+'yes') }}' width='100' height='100'>".replace("yes", path);
+    $(this).replaceWith(image);
+  });
+});
+</script>
 </head>
 <body>
 <p>Filters</p>
   <form action="/generateReport" method="POST">	
-  <select name="Duplicate" value="zero">
-  <option value="zero">Is Duplicate:</option>
-  <option value="0">0</option>
-  <option value="1">1</option>
-  </select>
-  <select name="Times_Visited" value="zero">
-  <option value="zero">Times Visited:</option>
-  <option value="5">5</option>
-  <option value="6">6</option>
-  <option value="7">7</option>
-  </select>
-  <input type="hidden" name="type" value="{{ x_id }}">
-  <input type="hidden" name="code" value="{{ x_code }}">
-  <input type="hidden" name="from_time" value="{{ xt_from }}">
-  <input type="hidden" name="to_time" value="{{ xt_to }}">
-  <input type="hidden" name="from_date" value="{{ xd_from }}">
-  <input type="hidden" name="to_date" value="{{ xd_to }}">
-  <input type="submit" value="Submit" name="submiT" class="btn btn-primary">
+  	<select name="Duplicate" value="empty">
+  	<option value="empty">Is Duplicate:</option>
+  	<option value="0">0</option>
+  	<option value="1">1</option>
+  	</select>
+  	<select name="Times_Visited" value="empty">
+  	<option value="empty">Times Visited:</option>
+  	<option value="5">5</option>
+  	<option value="6">6</option>
+  	<option value="7">7</option>
+  	</select>
+  	<input type="hidden" name="type" value="{{ x_id }}">
+  	<input type="hidden" name="code" value="{{ x_code }}">
+  	<input type="hidden" name="from_time" value="{{ xt_from }}">
+  	<input type="hidden" name="to_time" value="{{ xt_to }}">
+  	<input type="hidden" name="from_date" value="{{ xd_from }}">
+  	<input type="hidden" name="to_date" value="{{ xd_to }}">
+  	<input type="submit" value="Apply Filters" name="choice" class="btn btn-primary">
 
   </form>
 	<div class="limiter">
@@ -75,7 +85,8 @@
 									{% if row['path'] is none %}
 									<td class="cell100 column1">None</td>
 									{% else %}
-									<td class="cell100 column1"><a href="{{ url_for('download_file', filename='home'+row['path']) }}">Click Here</a></td>
+									<input type="hidden" id="hehe" value="{{ row['path'] }}">
+									<td class="cell100 column1"><p><button value="{{ row['path'] }}">Click</button></p></td>
 									{% endif %}
 									{% for sparsh in field %}
 									{% if 'path' in sparsh %}

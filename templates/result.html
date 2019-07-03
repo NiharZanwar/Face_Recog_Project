@@ -24,7 +24,7 @@ a:hover, a:active {
 <pre>  
 	
 	Data : {{ value }}       	
-	<a href= {{ url_for('login') }}>Upload Another Image</a>
+	<a href= "{{ url_for('login_done', username=username) }}">Upload Another Image</a>
 </pre>
 </header>
 
