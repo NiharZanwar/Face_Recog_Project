@@ -35,6 +35,7 @@ s_cam_code = 'cameracode'
 
 s_usr_name = 'username'
 s_usr_pass = 'userpassword'
+s_usr_id = 'userid'
 
 s_tximg_id = 'tx_img_id'
 s_face_count = 'faceno'
@@ -125,7 +126,7 @@ def add_new_camera(cameraname, bucketcode, cameratype, createddatetime):
     buc_id = buc_rows[0][s_buc_id]
     org_id = buc_rows[0][s_org_id]
     buc_markdel = buc_rows[0][s_mrkdel]
-    orgcode = extract_info(s_org_table, s_org_id, org_id)[1][0]['orgcode']
+    orgcode = extract_info(s_org_table, s_org_id, org_id)[1][0][s_org_code]
 
     if buc_markdel == 1:
         return 102, errordict[102]
@@ -258,6 +259,10 @@ def add_new_faceid(personid, facepath, img_id, org_id, bucket_id):
     return face_id
 
 
+sql_del = "UPDATE {} SET {} = '1' WHERE {} = {}"
+sql_renew = "UPDATE {} SET {} = '0' WHERE {} = {}"
+
+
 def del_org(org_id):
     """
     To disable an organisation
@@ -266,9 +271,9 @@ def del_org(org_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE `organisation` SET `markdelete` = '1' WHERE `oid` = %s", org_id)
-        cursor.execute("UPDATE `orgbucket` SET `markdelete` = '1' WHERE `oid` = %s", org_id)
-        cursor.execute("UPDATE `orgCamera` SET `markdelete` = '1' WHERE `oid` = %s", org_id)
+        cursor.execute(sql_del.format(s_org_table, s_mrkdel, s_org_id, org_id))
+        cursor.execute(sql_del.format(s_buc_table, s_mrkdel, s_org_id, org_id))
+        cursor.execute(sql_del.format(s_cam_table, s_mrkdel, s_org_id, org_id))
         connection.commit()
 
 
@@ -281,9 +286,9 @@ def renew_org(org_id):
 
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE `organisation` SET `markdelete` = '0' WHERE `oid` = %s", org_id)
-        cursor.execute("UPDATE `orgbucket` SET `markdelete` = '0' WHERE `oid` = %s", org_id)
-        cursor.execute("UPDATE `orgCamera` SET `markdelete` = '0' WHERE `oid` = %s", org_id)
+        cursor.execute(sql_renew.format(s_org_table, s_mrkdel, s_org_id, org_id))
+        cursor.execute(sql_renew.format(s_buc_table, s_mrkdel, s_org_id, org_id))
+        cursor.execute(sql_renew.format(s_cam_table, s_mrkdel, s_org_id, org_id))
         connection.commit()
 
 
@@ -295,8 +300,8 @@ def del_bucket(bucket_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE `orgbucket` SET `markdelete` = '1' WHERE `bucketid` = %s", bucket_id)
-        cursor.execute("UPDATE `orgCamera` SET `markdelete` = '1' WHERE `bucketid` = %s", bucket_id)
+        cursor.execute(sql_del.format(s_buc_table, s_mrkdel, s_buc_id, bucket_id))
+        cursor.execute(sql_del.format(s_cam_table, s_mrkdel, s_buc_id, bucket_id))
         connection.commit()
 
 
@@ -308,8 +313,8 @@ def renew_bucket(bucket_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE `orgbucket` SET `markdelete` = '0' WHERE `bucketid` = %s", bucket_id)
-        cursor.execute("UPDATE `orgCamera` SET `markdelete` = '0' WHERE `bucketid` = %s", bucket_id)
+        cursor.execute(sql_renew.format(s_buc_table, s_mrkdel, s_buc_id, bucket_id))
+        cursor.execute(sql_renew.format(s_cam_table, s_mrkdel, s_buc_id, bucket_id))
         connection.commit()
 
 
@@ -321,7 +326,7 @@ def del_camera(camera_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE `orgCamera` SET `markdelete` = '1' WHERE `cameraid` = %s", camera_id)
+        cursor.execute(sql_del.format(s_cam_table, s_mrkdel, s_cam_id, camera_id))
         connection.commit()
 
 
@@ -334,7 +339,7 @@ def renew_camera(camera_id):
 
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE `orgCamera` SET `markdelete` = '0' WHERE `cameraid` = %s", camera_id)
+        cursor.execute(sql_renew.format(s_cam_table, s_mrkdel, s_cam_id, camera_id))
         connection.commit()
 
 
@@ -347,7 +352,7 @@ def del_user(user_id):
 
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE `orgUser` SET `markdelete` = '1' WHERE `userid` = %s", user_id)
+        cursor.execute(sql_del.format(s_usr_table, s_mrkdel, s_usr_id, user_id))
         connection.commit()
 
 
@@ -359,7 +364,7 @@ def renew_user(user_id):
     """
     connection = sql_connection()[1]
     with connection.cursor() as cursor:
-        cursor.execute("UPDATE `orgUser` SET `markdelete` = '0' WHERE `userid` = %s", user_id)
+        cursor.execute(sql_renew.format(s_usr_table, s_mrkdel, s_usr_id, user_id))
         connection.commit()
 
 
